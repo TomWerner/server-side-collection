@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
@@ -134,8 +135,10 @@ public class FeedTests
         JSONObject results2 = null;
         try
         {
-            results1 = manager1.collectData(true, false, false, new JSONArray());
-            results2 = manager2.collectData(true, false, false, new JSONArray());
+            Calendar oneYearAgo = Calendar.getInstance();
+            oneYearAgo.add(Calendar.YEAR, -1);
+            results1 = manager1.collectData(true, false, new JSONArray(), oneYearAgo);
+            results2 = manager2.collectData(true, false, new JSONArray(), oneYearAgo);
         }
         catch (FacebookException e1)
         {
@@ -236,8 +239,10 @@ public class FeedTests
         JSONObject results2 = null;
         try
         {
-            results1 = manager1.collectData(true, false, false, new JSONArray());
-            results2 = manager2.collectData(true, false, false, new JSONArray());
+            Calendar oneYearAgo = Calendar.getInstance();
+            oneYearAgo.add(Calendar.YEAR, -1);
+            results1 = manager1.collectData(true, false, new JSONArray(), oneYearAgo);
+            results2 = manager2.collectData(true, false, new JSONArray(), oneYearAgo);
         }
         catch (FacebookException e1)
         {

@@ -3,6 +3,7 @@ package edu.uiowa.datacollection.fbtests;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
@@ -139,8 +140,10 @@ public class MessageTests
         JSONObject results2 = null;
         try
         {
-            results1 = manager1.collectData(false, true, true, new JSONArray());
-            results2 = manager2.collectData(false, true, false, new JSONArray());
+            Calendar oneYearAgo = Calendar.getInstance();
+            oneYearAgo.add(Calendar.YEAR, -1);
+            results1 = manager1.collectData(false, true, new JSONArray(), oneYearAgo);
+            results2 = manager2.collectData(false, true, new JSONArray(), oneYearAgo);
         }
         catch (FacebookException e1)
         {

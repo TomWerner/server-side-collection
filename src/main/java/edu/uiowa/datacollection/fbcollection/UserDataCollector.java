@@ -82,7 +82,7 @@ public class UserDataCollector
 //        // This has a mapping between thread id's and the last message we have
 //        // from that thread
         HashMap<String, Long> lastTimes = MessageJSONConverter.getOldTimes(lastConvoTimes);
-        
+//        
 
         JSONArray result = new JSONArray();
         ArrayList<Message> allowedMessages = MessageJSONConverter.getAllAllowedConversations(session, notBefore);
