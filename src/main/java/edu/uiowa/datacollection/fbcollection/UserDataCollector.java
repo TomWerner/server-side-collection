@@ -2,6 +2,7 @@ package edu.uiowa.datacollection.fbcollection;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import facebook4j.Facebook;
@@ -22,6 +23,7 @@ public class UserDataCollector
 
     private static final String APP_ID = "442864129167674";
     private static final String APP_SECRET = "f2140fbb0148c5db21db0d07b92e6ade";
+    private static final long SECONDS_TO_MILLISECONDS = 1000;
 
     public UserDataCollector(String accessToken, String phoneNumber)
     {
@@ -82,12 +84,18 @@ public class UserDataCollector
 //        // This has a mapping between thread id's and the last message we have
 //        // from that thread
         HashMap<String, Long> lastTimes = MessageJSONConverter.getOldTimes(lastConvoTimes);
-//        
 
         JSONArray result = new JSONArray();
         ArrayList<Message> allowedMessages = MessageJSONConverter.getAllAllowedConversations(session, notBefore);
         for (Message message : allowedMessages)
         {
+            if (lastTimes.containsKey(message.getId()))
+            {
+                GregorianCalendar cal = new GregorianCalendar();
+                cal.setTimeInMillis(lastTimes.get(message.getId()) * SECONDS_TO_MILLISECONDS);
+                if (notBefore.before(cal))
+                    notBefore = cal;
+            }
             result.put(MessageJSONConverter.createMessageJSONObject(session, message, notBefore));
         }
         

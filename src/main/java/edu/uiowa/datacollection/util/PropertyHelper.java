@@ -1,10 +1,9 @@
 package edu.uiowa.datacollection.util;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class PropertyHelper
 {
@@ -23,31 +22,20 @@ public class PropertyHelper
 	/*
 	 * Other properties can be added here
 	 */
-	public PropertyHelper(String fileName)
+	public PropertyHelper(String filename)
 	{
-		BufferedReader br;
-		ArrayList<String> propertyList = null;
-		try
-		{
-			br = new BufferedReader(new FileReader(fileName));
-			propertyList = new ArrayList<String>();
-			String line;
-			while ((line = br.readLine()) != null)
-			{
-				propertyList.add(line);
-			}
-			br.close();
-		}
-		catch (FileNotFoundException e)
-		{
-			System.out.println("ERROR: Could not find file.");
-			System.out.println(e.getMessage());
-		}
-		catch (IOException e)
-		{
-			System.out.println("ERROR: Could not open the file.");
-			System.out.println(e.getMessage());
-		}
+        ArrayList<String> propertyList = new ArrayList<String>();
+        try
+        {
+            Scanner fileScanner = new Scanner(new File(filename));
+            while (fileScanner.hasNextLine())
+                propertyList.add(fileScanner.nextLine());
+            fileScanner.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.err.println("There's been a mishap. Please attemp to locate " + filename + "\nWe looked in the absolute path of \n\n" + new File(filename).getAbsolutePath());
+        }
 
 		for (int i = 0; i < propertyList.size(); i++)
 		{

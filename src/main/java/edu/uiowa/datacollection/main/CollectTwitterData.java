@@ -17,9 +17,10 @@ public class CollectTwitterData
 
 	/**
 	 * @param args
+	 * @throws JSONException 
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception
+	public static void main(String[] args) throws JSONException
 	{
 		PropertyHelper ph = new PropertyHelper("dataCollection.properties");
 
