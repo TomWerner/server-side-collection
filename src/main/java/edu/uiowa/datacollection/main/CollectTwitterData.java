@@ -1,6 +1,7 @@
 package edu.uiowa.datacollection.main;
 
-import java.util.Scanner;
+import java.util.Calendar;
+import java.util.Date;
 
 import edu.uiowa.datacollection.twitter.DataManager;
 import edu.uiowa.datacollection.twitter.User;
@@ -24,7 +25,7 @@ public class CollectTwitterData
 	{
 		PropertyHelper ph = new PropertyHelper("dataCollection.properties");
 
-		String baseFilename = "facebook_data";
+		String baseFilename = "twitter_data";
 		boolean saveJsonDataLocally = false;
 
 //		System.out.print("Save JSON data locally? (y/n): ");
@@ -57,7 +58,7 @@ public class CollectTwitterData
 		{
 			JSONObject userToken = userList.getJSONObject(i);
 			User user = createUser(userToken);
-
+            
 
 			System.out.println("Currently twitter accessing data for "
 					+ user.getTwitterID());
@@ -65,6 +66,13 @@ public class CollectTwitterData
 
 			if (!user.getOauthToken().equals(BLANK_TWITTER_TOKEN ))
 			{
+	            long registerDate = (long)Double.parseDouble(userToken.getString("registerDate")) * 1000L;
+	            Date date = new Date(registerDate);
+	            Calendar lastUploadTimeOrRegistration = Calendar.getInstance();
+	            lastUploadTimeOrRegistration.setTime(date);
+	            lastUploadTimeOrRegistration.add(Calendar.HOUR, 5);
+	            System.out.println(lastUploadTimeOrRegistration.getTime());
+	            
 				DataManager manager = new DataManager(user);
 
 				manager.collectData(true, // Collect direct conversations
@@ -73,11 +81,11 @@ public class CollectTwitterData
 				if (saveJsonDataLocally)
 				{
 					manager.saveJsonData(baseFilename + "_"
-							+ user.getTwitterID());
+							+ user.getTwitterID(), lastUploadTimeOrRegistration);
 				}
 
 				JsonHelper.postJsonData(ph.getTwitterUploadUrl(),
-						manager.getJsonData());
+						manager.getJsonData(lastUploadTimeOrRegistration));
 			}
 			else
 			{

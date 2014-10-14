@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -430,7 +431,7 @@ public class DataManager
 		this.user = user;
 	}
 
-	public JSONObject getJsonData() throws JSONException
+	public JSONObject getJsonData(Calendar notBefore) throws JSONException
 	{
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("user", user.getTwitterID());
@@ -444,14 +445,16 @@ public class DataManager
 		JSONArray convoJsonArray = new JSONArray();
 		for (Conversation c : conversations)
 		{
-			convoJsonArray.put(c.getJSONRepresentation());
+		    if (c.getEndTime().after(notBefore.getTime()))
+		        convoJsonArray.put(c.getJSONRepresentation());
 		}
 		jsonObject.put("conversationData", convoJsonArray);
 
 		JSONArray statusJsonArray = new JSONArray();
 		for (Message msg : statusList)
 		{
-			statusJsonArray.put(msg.getJSONRepresentation());
+		    if (msg.getCreateTime().after(notBefore.getTime()))
+		        statusJsonArray.put(msg.getJSONRepresentation());
 		}
 		jsonObject.put("statusData", statusJsonArray);
 
@@ -472,7 +475,7 @@ public class DataManager
 		}
 	}
 
-	public void saveJsonData(String filename)
+	public void saveJsonData(String filename, Calendar notBefore)
 	{
 		File file = new File(filename);
 
@@ -480,7 +483,7 @@ public class DataManager
 		{
 			FileOutputStream f = new FileOutputStream(file);
 			PrintWriter pw = new PrintWriter(f);
-			JSONObject result = getJsonData();
+			JSONObject result = getJsonData(notBefore);
 
 			pw.append(result.toString(1) + "\n");
 
