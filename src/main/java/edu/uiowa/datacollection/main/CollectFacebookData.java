@@ -21,7 +21,7 @@ public class CollectFacebookData
         JSONObject obj = null;
 
         String baseFilename = "facebook_data";
-        boolean saveJsonDataLocally = true;
+        boolean saveJsonDataLocally = false;
 
         // System.out.print("Save JSON data locally? (y/n): ");
         // Scanner scan = new Scanner(System.in);
