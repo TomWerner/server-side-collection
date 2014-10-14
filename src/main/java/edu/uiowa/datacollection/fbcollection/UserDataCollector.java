@@ -59,6 +59,12 @@ public class UserDataCollector
             return new JSONArray();
 
         ResponseList<Post> feed = session.getFeed();
+        
+        // In order to collect new comments on old posts we need to look backwards on the feed
+        // a month. Then once we have the posts we only handle those that have been updated
+        // after our date.
+//        Calendar lookBackwards = (Calendar) notBefore.clone();
+//        lookBackwards.add(Calendar.MONTH, -1);
         ArrayList<Post> posts = FeedJSONConverter.getAllOfPageableList(session, feed, notBefore);
 
         // Now that we have collected all of the posts, add them into a
@@ -70,8 +76,10 @@ public class UserDataCollector
         {
             // While constructing the JSON it also collects the comments and
             // likes
-            if (post.getCreatedTime().after(notBefore.getTime()))
+            if (post.getUpdatedTime().after(notBefore.getTime()))
+            {
                 result.put(FeedJSONConverter.createPostJSONObject(session, post));
+            }
         }
 
         return result;

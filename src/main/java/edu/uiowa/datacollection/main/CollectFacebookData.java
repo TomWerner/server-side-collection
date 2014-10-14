@@ -17,12 +17,11 @@ public class CollectFacebookData
 
     public static void main(String[] args) throws FacebookException, JSONException
     {
-        long time = System.currentTimeMillis();
         PropertyHelper ph = new PropertyHelper("dataCollection.properties");
         JSONObject obj = null;
 
         String baseFilename = "facebook_data";
-        boolean saveJsonDataLocally = false;
+        boolean saveJsonDataLocally = true;
 
         // System.out.print("Save JSON data locally? (y/n): ");
         // Scanner scan = new Scanner(System.in);
@@ -55,7 +54,7 @@ public class CollectFacebookData
 
             String accessToken = user.getString("token");
             String phoneNumber = user.getString("phone");
-            long registerDate = (long)Double.parseDouble(user.getString("registerDate")) * 1000L; //TODO: Fix this to registerDate
+            long registerDate = (long)Double.parseDouble(user.getString("registerDate")) * 1000L;
             JSONArray lastConvoTimes = user.getJSONArray("info");
 
             System.out.println("Currently facebook accessing data for " + phoneNumber);
@@ -68,17 +67,17 @@ public class CollectFacebookData
                 boolean collectMessages = true;
                 
                 Date date = new Date(registerDate);
-                Calendar earlierAllowedCollection = Calendar.getInstance();
-                earlierAllowedCollection.setTime(date);
-                System.out.println(date);
+                Calendar lastUploadTimeOrRegistration = Calendar.getInstance();
+                lastUploadTimeOrRegistration.setTime(date);
+                lastUploadTimeOrRegistration.add(Calendar.HOUR, 5);
+                System.out.println(lastUploadTimeOrRegistration.getTime());
                 System.out.println("\t\tBeginning collection");
-                JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, earlierAllowedCollection);
+                JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, lastUploadTimeOrRegistration);
                 System.out.println("\t\tFinshed collection");
 
                 if (saveJsonDataLocally)
                     JsonHelper.saveJsonData(jsonData, baseFilename + "_" + phoneNumber);
                 
-                time = System.currentTimeMillis();
                 System.out.println("\t\tBeginning upload");
                 JsonHelper.postJsonData(ph.getFacebookUploadUrl(), jsonData);
                 System.out.println("\t\tFinished upload");
@@ -88,6 +87,5 @@ public class CollectFacebookData
                 System.out.println("\tSkipping user.");
             }
         }
-        System.out.println(System.currentTimeMillis() - time);
     }
 }
