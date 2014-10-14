@@ -42,7 +42,7 @@ public class UserDataCollector
         try
         {
             result.put("conversation_data", collectMessages(collectMessage, lastConvoTimes, notBefore));
-            result.put("stream_data", collectFeed(collectFeed));
+            result.put("stream_data", collectFeed(collectFeed, notBefore));
             result.put("user", phoneNumber);
         }
         catch (JSONException e)
@@ -53,13 +53,13 @@ public class UserDataCollector
         return result;
     }
 
-    private JSONArray collectFeed(boolean collectFeed) throws FacebookException
+    private JSONArray collectFeed(boolean collectFeed, Calendar notBefore) throws FacebookException
     {
         if (!collectFeed)
             return new JSONArray();
 
         ResponseList<Post> feed = session.getFeed();
-        ArrayList<Post> posts = FeedJSONConverter.getAllOfPageableList(session, feed);
+        ArrayList<Post> posts = FeedJSONConverter.getAllOfPageableList(session, feed, notBefore);
 
         // Now that we have collected all of the posts, add them into a
         // JSONArray to return them
@@ -70,7 +70,8 @@ public class UserDataCollector
         {
             // While constructing the JSON it also collects the comments and
             // likes
-            result.put(FeedJSONConverter.createPostJSONObject(session, post));
+            if (post.getCreatedTime().after(notBefore.getTime()))
+                result.put(FeedJSONConverter.createPostJSONObject(session, post));
         }
 
         return result;

@@ -1,6 +1,7 @@
 package edu.uiowa.datacollection.main;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import edu.uiowa.datacollection.fbcollection.UserDataCollector;
 import edu.uiowa.datacollection.util.JsonHelper;
@@ -16,6 +17,7 @@ public class CollectFacebookData
 
     public static void main(String[] args) throws FacebookException, JSONException
     {
+        long time = System.currentTimeMillis();
         PropertyHelper ph = new PropertyHelper("dataCollection.properties");
         JSONObject obj = null;
 
@@ -53,10 +55,10 @@ public class CollectFacebookData
 
             String accessToken = user.getString("token");
             String phoneNumber = user.getString("phone");
+            long registerDate = (long)Double.parseDouble(user.getString("registerDate")) * 1000L; //TODO: Fix this to registerDate
             JSONArray lastConvoTimes = user.getJSONArray("info");
 
-            System.out.println("Currently accessing data for " + phoneNumber);
-            System.out.println("\tAccess Token: " + accessToken);
+            System.out.println("Currently facebook accessing data for " + phoneNumber);
 
             if (!accessToken.equals(BLANK_ACCESS_TOKEN))
             {
@@ -65,20 +67,27 @@ public class CollectFacebookData
                 boolean collectFeed = true;
                 boolean collectMessages = true;
                 
-                // TODO: Set this to the date the user entered the survey
-                Calendar oneYearAgo = Calendar.getInstance();
-                oneYearAgo.add(Calendar.YEAR, -1);
-                JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, oneYearAgo);
+                Date date = new Date(registerDate);
+                Calendar earlierAllowedCollection = Calendar.getInstance();
+                earlierAllowedCollection.setTime(date);
+                System.out.println(date);
+                System.out.println("\t\tBeginning collection");
+                JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, earlierAllowedCollection);
+                System.out.println("\t\tFinshed collection");
 
                 if (saveJsonDataLocally)
                     JsonHelper.saveJsonData(jsonData, baseFilename + "_" + phoneNumber);
-
+                
+                time = System.currentTimeMillis();
+                System.out.println("\t\tBeginning upload");
                 JsonHelper.postJsonData(ph.getFacebookUploadUrl(), jsonData);
+                System.out.println("\t\tFinished upload");
             }
             else
             {
                 System.out.println("\tSkipping user.");
             }
         }
+        System.out.println(System.currentTimeMillis() - time);
     }
 }

@@ -59,7 +59,7 @@ public class CollectTwitterData
 			User user = createUser(userToken);
 
 
-			System.out.println("Currently accessing data for "
+			System.out.println("Currently twitter accessing data for "
 					+ user.getTwitterID());
 			System.out.println("\tAccess Token: " + user.getOauthToken());
 

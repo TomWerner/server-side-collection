@@ -1,6 +1,7 @@
 package edu.uiowa.datacollection.fbcollection;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import facebook4j.Paging;
 import facebook4j.Place;
 import facebook4j.Post;
 import facebook4j.Privacy;
+import facebook4j.ResponseList;
 import facebook4j.Tag;
 import facebook4j.internal.org.json.JSONArray;
 import facebook4j.internal.org.json.JSONException;
@@ -326,6 +328,28 @@ public class FeedJSONConverter
             PagableList<T> page2 = session.fetchNext(paging);
             result.addAll(page2);
             paging = page2.getPaging();
+        }
+
+        return result;
+    }
+
+    public static ArrayList<Post> getAllOfPageableList(Facebook session, PagableList<Post> list, Calendar notBefore) throws FacebookException
+    {
+        ArrayList<Post> result = new ArrayList<Post>();
+
+        result.addAll(list);
+        Paging<Post> paging = list.getPaging();
+        while (paging != null && paging.getNext() != null && paging.getNext().toString().length() != 0)
+        {
+            PagableList<Post> page2 = session.fetchNext(paging);
+            result.addAll(page2);
+            paging = page2.getPaging();
+            
+            if (page2.size() > 0)
+            {
+                if (page2.get(0).getUpdatedTime().before(notBefore.getTime()) && page2.get(page2.size() - 1).getUpdatedTime().before(notBefore.getTime()))
+                    break;
+            }
         }
 
         return result;
