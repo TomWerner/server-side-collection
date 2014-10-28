@@ -54,7 +54,7 @@ public class CollectFacebookData
 
             String accessToken = user.getString("token");
             String phoneNumber = user.getString("phone");
-            long registerDate = (long)Double.parseDouble(user.getString("registerDate")) * 1000L;
+            long registerDate = (long) Double.parseDouble(user.getString("registerDate")) * 1000L;
             JSONArray lastConvoTimes = user.getJSONArray("info");
 
             System.out.println("Currently facebook accessing data for " + phoneNumber);
@@ -65,22 +65,36 @@ public class CollectFacebookData
 
                 boolean collectFeed = true;
                 boolean collectMessages = true;
-                
+
                 Date date = new Date(registerDate);
                 Calendar lastUploadTimeOrRegistration = Calendar.getInstance();
                 lastUploadTimeOrRegistration.setTime(date);
                 lastUploadTimeOrRegistration.add(Calendar.HOUR, 5);
                 System.out.println(lastUploadTimeOrRegistration.getTime());
                 System.out.println("\t\tBeginning collection");
-                JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, lastUploadTimeOrRegistration);
-                System.out.println("\t\tFinshed collection");
+                try
+                {
+                    JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, lastUploadTimeOrRegistration);
+                    System.out.println("\t\tFinshed collection");
 
-                if (saveJsonDataLocally)
-                    JsonHelper.saveJsonData(jsonData, baseFilename + "_" + phoneNumber);
-                
-                System.out.println("\t\tBeginning upload");
-                JsonHelper.postJsonData(ph.getFacebookUploadUrl(), jsonData);
-                System.out.println("\t\tFinished upload");
+                    if (saveJsonDataLocally)
+                        JsonHelper.saveJsonData(jsonData, baseFilename + "_" + phoneNumber);
+
+                    System.out.println("\t\tBeginning upload");
+                    JsonHelper.postJsonData(ph.getFacebookUploadUrl(), jsonData);
+                    System.out.println("\t\tFinished upload");
+                }
+                catch (FacebookException e)
+                {
+                    if (e.getStatusCode() == 403) // OAuthException
+                    {
+                        System.err.println("ERROR WITH PERMISSIONS");
+                    }
+                    else
+                    {
+                        e.printStackTrace();
+                    }
+                }
             }
             else
             {
