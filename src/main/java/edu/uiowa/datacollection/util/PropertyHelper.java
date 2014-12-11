@@ -4,7 +4,7 @@ package edu.uiowa.datacollection.util;
 public class PropertyHelper
 {
 
-	private String baseUrl = "http://128.255.45.52:7777/DataCollection";
+	private String baseUrl = "http://128.255.45.52/DataCollection";
 	private String facebookTokensUrl = "/getfacetoken/";
 	private String facebookUploadURL = "/postfacebook/";
 	private String twitterTokensUrl = "/gettwittertoken/";
