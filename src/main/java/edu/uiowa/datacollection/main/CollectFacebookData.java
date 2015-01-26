@@ -74,7 +74,8 @@ public class CollectFacebookData
                 System.out.println("\t\tBeginning collection");
                 try
                 {
-                    JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes, lastUploadTimeOrRegistration);
+                    JSONObject jsonData = manager.collectData(collectFeed, collectMessages, lastConvoTimes,
+                            lastUploadTimeOrRegistration);
                     System.out.println("\t\tFinshed collection");
 
                     if (saveJsonDataLocally)

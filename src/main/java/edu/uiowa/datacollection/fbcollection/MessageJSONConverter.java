@@ -38,7 +38,8 @@ public class MessageJSONConverter
         return result;
     }
 
-    public static JSONObject createMessageJSONObject(Facebook session, Message conversation, Calendar notBefore) throws FacebookException
+    public static JSONObject createMessageJSONObject(Facebook session, Message conversation, Calendar notBefore)
+            throws FacebookException
     {
         JSONObject result = new JSONObject();
         try
@@ -52,7 +53,7 @@ public class MessageJSONConverter
             result.put("updated_time", conversation.getUpdatedTime());
 
             // Get the comments
-            ArrayList<Comment> allowedComments = collectMessageComments(session, conversation, notBefore);           
+            ArrayList<Comment> allowedComments = collectMessageComments(session, conversation, notBefore);
             JSONArray jsonComments = new JSONArray();
             for (Comment comment : allowedComments)
             {
@@ -80,10 +81,11 @@ public class MessageJSONConverter
         return result;
     }
 
-    private static ArrayList<Comment> collectMessageComments(Facebook session, Message conversation, Calendar notBefore) throws FacebookException
+    private static ArrayList<Comment> collectMessageComments(Facebook session, Message conversation, Calendar notBefore)
+            throws FacebookException
     {
         ArrayList<Comment> allowedComments = new ArrayList<Comment>();
-        
+
         PagableList<Comment> pageList = conversation.getComments();
         for (int i = pageList.size() - 1; i >= 0; i--)
         {
@@ -92,10 +94,30 @@ public class MessageJSONConverter
                 allowedComments.add(0, pageList.get(i));
             }
         }
-        
-        while ((pageList.size() == 0 || pageList.get(0).getCreatedTime().after(notBefore.getTime())) && pageList.getPaging() != null)
+
+        while ((pageList.size() == 0 || pageList.get(0).getCreatedTime().after(notBefore.getTime()))
+                && pageList.getPaging() != null)
         {
-            pageList = session.fetchNext(pageList.getPaging());
+            try
+            {
+                pageList = session.fetchNext(pageList.getPaging());
+            }
+            catch (FacebookException e)
+            {
+                try
+                {
+                    for (int i = 1; i < 11; i++)
+                    {
+                        System.out.println("Sleeping for minute " + i);
+                        Thread.sleep(60 * 1000);// Sleep 1 minute
+                    }
+                    pageList = session.fetchNext(pageList.getPaging());
+                }
+                catch (InterruptedException e1)
+                {
+                    e1.printStackTrace();
+                }
+            }
             for (int i = pageList.size() - 1; i >= 0; i--)
             {
                 if (pageList.get(i).getCreatedTime().after(notBefore.getTime()))
@@ -104,7 +126,7 @@ public class MessageJSONConverter
                 }
             }
         }
-        
+
         return allowedComments;
     }
 
@@ -163,10 +185,21 @@ public class MessageJSONConverter
         }
         return result;
     }
-    
-    public static ArrayList<Message> getAllAllowedConversations(Facebook session, Calendar notBefore) throws FacebookException
+
+    public static ArrayList<Message> getAllAllowedConversations(Facebook session, Calendar notBefore)
+            throws FacebookException
     {
-        PagableList<Message> pageList = session.getInbox();
+        PagableList<Message> pageList = null;
+        try
+        {
+            pageList = session.getInbox();
+        }
+        catch (FacebookException e)
+        {
+            if (e.getMessage().equals("JSONObject[\"summary\"] is not a JSONObject."))
+                return new ArrayList<Message>();
+        }
+
         ArrayList<Message> allowedMessages = new ArrayList<Message>();
         for (int i = 0; i < pageList.size(); i++)
         {
@@ -175,8 +208,9 @@ public class MessageJSONConverter
                 allowedMessages.add(pageList.get(i));
             }
         }
-        
-        while ((pageList.size() == 0 || pageList.get(pageList.size() - 1).getUpdatedTime().after(notBefore.getTime())) && pageList.getPaging() != null)
+
+        while ((pageList.size() == 0 || pageList.get(pageList.size() - 1).getUpdatedTime().after(notBefore.getTime()))
+                && pageList.getPaging() != null)
         {
             for (int i = 0; i < pageList.size(); i++)
             {
