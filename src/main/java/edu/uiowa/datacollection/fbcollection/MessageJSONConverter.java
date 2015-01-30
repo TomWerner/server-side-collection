@@ -1,5 +1,6 @@
 package edu.uiowa.datacollection.fbcollection;
 
+import java.awt.List;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -198,6 +199,11 @@ public class MessageJSONConverter
         {
             if (e.getMessage().equals("JSONObject[\"summary\"] is not a JSONObject."))
                 return new ArrayList<Message>();
+            else
+            {
+                e.printStackTrace();
+                pageList = (PagableList<Message>) new List();
+            }
         }
 
         ArrayList<Message> allowedMessages = new ArrayList<Message>();
