@@ -1,6 +1,5 @@
 package edu.uiowa.datacollection.fbcollection;
 
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -202,7 +201,7 @@ public class MessageJSONConverter
             else
             {
                 e.printStackTrace();
-                pageList = (PagableList<Message>) new List();
+                return new ArrayList<Message>();
             }
         }
 
